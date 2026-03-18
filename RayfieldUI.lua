@@ -1636,6 +1636,31 @@ function RayfieldLibrary:CreateWindow(Settings)
 	local Passthrough = false
 	Topbar.Title.Text = Settings.Name
 
+-- [톱니바퀴 설정 버튼 추가 로직]
+	if Settings.ConfigurationSaving and Settings.ConfigurationSaving.ShowConfigurationTab then
+		local SettingsButton = Topbar.Search:Clone()
+		SettingsButton.Name = "Settings"
+		SettingsButton.Visible = true
+		SettingsButton.Parent = Topbar
+		SettingsButton.Image = "rbxassetid://7072721666" -- 톱니바퀴 아이콘
+		SettingsButton.Position = UDim2.new(1, -70, 0.5, 0) -- 돋보기 옆자리
+		
+		-- 클릭 시 설정 탭으로 이동
+		SettingsButton.MouseButton1Click:Connect(function()
+			if Elements:FindFirstChild('Rayfield Settings') then
+				Elements.UIPageLayout:JumpTo(Elements['Rayfield Settings'])
+			end
+		end)
+		
+		-- 마우스 호버 효과
+		SettingsButton.MouseEnter:Connect(function()
+			TweenService:Create(SettingsButton, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageTransparency = 0}):Play()
+		end)
+		SettingsButton.MouseLeave:Connect(function()
+			TweenService:Create(SettingsButton, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageTransparency = 0.8}):Play()
+		end)
+	end
+
 	Main.Size = UDim2.new(0, 420, 0, 100)
 	Main.Visible = true
 	Main.BackgroundTransparency = 1
