@@ -2647,7 +2647,7 @@ if not correctBuild and not Settings.DisableBuildWarnings then
 
 		-- Input
 function Tab:CreateInput(InputSettings)
-			local Input = Elements.Template.Input:Clone()
+local Input = Elements.Template.Input:Clone()
 			Input.Name = InputSettings.Name
 			Input.Title.Text = InputSettings.Name
 			Input.Visible = true
@@ -2658,12 +2658,12 @@ function Tab:CreateInput(InputSettings)
 			Input.Title.TextTransparency = 1
 
 			Input.InputFrame.InputBox.Text = InputSettings.CurrentValue or ''
-			-- [수정] 텍스트 정렬을 항상 왼쪽으로 고정 (긴 링크 스크롤/드래그 UX 개선)
+			-- [수정] 텍스트 정렬을 항상 왼쪽으로 고정 (긴 링크 드래그 및 확인 편의성)
 			Input.InputFrame.InputBox.TextXAlignment = Enum.TextXAlignment.Left
 
 			Input.InputFrame.BackgroundColor3 = SelectedTheme.InputBackground
 			Input.InputFrame.UIStroke.Color = SelectedTheme.InputStroke
-			-- [수정] 텍스트가 상자 밖으로 튀어나오지 않게 잘라냄
+			-- [수정] 텍스트가 상자 밖으로 튀어나와 제목을 가리지 않게 잘라냄
 			Input.InputFrame.ClipsDescendants = true
 
 			TweenService:Create(Input, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
@@ -2710,7 +2710,9 @@ function Tab:CreateInput(InputSettings)
 			end)
 
 			Input.InputFrame.InputBox:GetPropertyChangedSignal("Text"):Connect(function()
-				TweenService:Create(Input.InputFrame, TweenInfo.new(0.55, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Size = UDim2.new(0, Input.InputFrame.InputBox.TextBounds.X + 24, 0, 30)}):Play()
+				-- [수정] 텍스트 입력 중에도 실시간으로 너비 제한(최대 300)을 유지함
+				local targetWidth = math.clamp(Input.InputFrame.InputBox.TextBounds.X + 24, 30, 300)
+				TweenService:Create(Input.InputFrame, TweenInfo.new(0.55, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Size = UDim2.new(0, targetWidth, 0, 30)}):Play()
 			end)
 
 			function InputSettings:Set(text)
