@@ -3827,20 +3827,44 @@ end
 function RayfieldLibrary:LoadConfiguration()
 	if not CEnabled then return end
 	
-	-- 기존의 복잡한 로직(local config, if useStudio 등)을 싹 지운 자리에 들어가는 핵심 코드
 	local filePath = ConfigurationFolder .. "/" .. CFileName .. ConfigurationExtension
+	
+	-- 1. 실행기의 파일 시스템 지원 여부 체크 및 알림 (복구)
+	if not isfile then
+		RayfieldLibrary:Notify({
+			Title = "Rayfield Configurations", 
+			Content = "사용 중인 실행기가 파일 시스템을 지원하지 않아 설정을 불러올 수 없어.", 
+			Image = 4384402990
+		})
+		return
+	end
+
 	if isfile(filePath) then
 		local success, data = pcall(function() 
 			return game:GetService("HttpService"):JSONDecode(readfile(filePath)) 
 		end)
 		
 		if success and data then
-			-- 파일에 저장된 값을 현재 UI에 강제로 하나씩 박아넣음 (재실행 먹통 방지)
 			for flag, value in pairs(data) do
 				if RayfieldLibrary.Flags[flag] then 
 					pcall(function() RayfieldLibrary.Flags[flag]:Set(value) end)
 				end
 			end
+			-- 2. 설정 로드 성공 알림 (복구) 
+			RayfieldLibrary:Notify({
+				Title = "Rayfield Configurations", 
+				Content = "이전 세션의 설정값을 성공적으로 불러왔어!", 
+				Duration = 5, 
+				Image = 4384403532
+			})
+		else
+			-- 3. 설정 로드 오류 발생 시 알림 (복구) 
+			warn('Rayfield Configurations Error | 세이브 파일 읽기 오류')
+			RayfieldLibrary:Notify({
+				Title = "Rayfield Configurations", 
+				Content = "설정 파일을 읽는 중에 오류가 발생했어. 개발자 콘솔을 확인해봐.", 
+				Image = 4384402990
+			})
 		end
 	end
 	globalLoaded = true
