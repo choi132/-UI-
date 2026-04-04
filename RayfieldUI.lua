@@ -2646,7 +2646,7 @@ if not correctBuild and not Settings.DisableBuildWarnings then
 		end
 
 		-- Input
-		function Tab:CreateInput(InputSettings)
+function Tab:CreateInput(InputSettings)
 			local Input = Elements.Template.Input:Clone()
 			Input.Name = InputSettings.Name
 			Input.Title.Text = InputSettings.Name
@@ -2657,8 +2657,11 @@ if not correctBuild and not Settings.DisableBuildWarnings then
 			Input.UIStroke.Transparency = 1
 			Input.Title.TextTransparency = 1
 
+			-- [핵심 수정: 텍스트가 프레임을 뚫고 나가지 않도록 설정]
 			Input.InputFrame.InputBox.Text = InputSettings.CurrentValue or ''
-
+			Input.InputFrame.InputBox.TextWrapped = true -- 텍스트 줄바꿈 활성화
+			Input.InputFrame.InputBox.ClipsDescendants = true -- 프레임 밖으로 나가는 텍스트 절단
+			
 			Input.InputFrame.BackgroundColor3 = SelectedTheme.InputBackground
 			Input.InputFrame.UIStroke.Color = SelectedTheme.InputStroke
 
@@ -2667,7 +2670,7 @@ if not correctBuild and not Settings.DisableBuildWarnings then
 			TweenService:Create(Input.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()	
 
 			Input.InputFrame.InputBox.PlaceholderText = InputSettings.PlaceholderText
-			Input.InputFrame.Size = UDim2.new(0, Input.InputFrame.InputBox.TextBounds.X + 24, 0, 30)
+			Input.InputFrame.Size = UDim2.new(0, math.min(Input.InputFrame.InputBox.TextBounds.X + 24, 180), 0, 30)
 
 			Input.InputFrame.InputBox.FocusLost:Connect(function()
 				local Success, Response = pcall(function()
